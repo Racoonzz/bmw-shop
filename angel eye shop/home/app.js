@@ -10,10 +10,25 @@ for (var i = 0; i < arrow.length; i++) {
 }
 let sidebar = document.querySelector(".sidebar");
 
+let cart = [];
+let isCartTabActive = false;
+let isExploreTabActive = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadCart();
+  if (isCartTabActive) {
+    renderCart();
+  }
+});
 
 
-
-
+function clearExploreSection() {
+  // Get the explore section if it exists
+  const exploreSection = document.querySelector('.products');
+  if (exploreSection) {
+    exploreSection.innerHTML = ''; // Clear the content
+  }
+}
 
 $(function () {
   resizeScreen();
@@ -44,18 +59,32 @@ function resizeScreen() {
 
 function navigateTo(option, className, text) {
   isExploreTabActive = false;
+  isCartTabActive = false;
 
-  // Clear the Explore section if it exists
-  clearExploreSection();
+  // Clear the home section content
+  const homeSection = document.getElementById('home');
+  homeSection.innerHTML = '';
 
   // Set the home class and update text
-  home.classList = className;
+  homeSection.classList = className;
   document.getElementById("text").innerHTML = text;
+
+  // If navigating to cart, show cart content
+  if (option === 'cart') {
+    isCartTabActive = true;
+    let cartContainer = document.createElement('div');
+    cartContainer.id = 'cart-container';
+    homeSection.appendChild(cartContainer);
+    renderCart();
+  }
 }
+
 
 Home.addEventListener('click', function () {
   navigateTo('home', 'home', 'Home');
-})
+  const homeSection = document.getElementById('home');
+  homeSection.innerHTML = ''; // Clear any existing content
+});
 
 Cart.addEventListener('click', function () {
   navigateTo('cart', 'cart', 'Cart');
@@ -143,6 +172,61 @@ Explore.addEventListener('click', function () {
 // Common Logic
 //----------------
 
+function addToCart(event) {
+  event.preventDefault();
+  const productId = parseInt(event.target.id);
+  
+  fetch('https://hur.webmania.cc/products.json')
+      .then(response => response.json())
+      .then(data => {
+          const product = data.products.find(p => p.id === productId);
+          if (product) {
+              const existingItem = cart.find(item => item.id === productId);
+              if (existingItem) {
+                  existingItem.quantity += 1;
+              } else {
+                  cart.push({
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: product.picture,
+                      quantity: 1
+                  });
+              }
+              saveCart();
+              alert('Product added to cart!');
+              if (isCartTabActive) {
+                  renderCart();
+              }
+          }
+      })
+      .catch(error => console.error('Error:', error));
+}
+
+function updateQuantity(itemId, change) {
+  const item = cart.find(item => item.id === itemId);
+  if (item) {
+      item.quantity += change;
+      if (item.quantity <= 0) {
+          removeFromCart(itemId);
+      } else {
+          saveCart();
+          renderCart();
+      }
+  }
+}
+
+function removeFromCart(itemId) {
+  cart = cart.filter(item => item.id !== itemId);
+  saveCart();
+  renderCart();
+}
+
+function calculateTotal() {
+  return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+}
+
+
 // Add a listener to reset the flag when leaving the Explore tab
 document.addEventListener('click', function (event) {
   if (!event.target.matches('#Explore')) {
@@ -150,15 +234,187 @@ document.addEventListener('click', function (event) {
   }
 });
 
-function addToCart() {
-  console.log('Add to cart clicked. Product ID:', this.id);
-  // Implement your addToCart logic here
+// Modify your existing Cart event listener to this:
+Cart.addEventListener('click', function () {
+  isExploreTabActive = false;
+  isCartTabActive = true;
+  
+  const homeSection = document.getElementById('home');
+  homeSection.innerHTML = ''; // Clear existing content
+  homeSection.className = 'cart';
+  document.getElementById("text").innerHTML = "Cart";
+  
+  // Create cart structure
+  const cartHTML = `
+      <div id="cart-container">
+          <div class="cart-content">
+              <h2>Shopping Cart</h2>
+              <div id="cart-items"></div>
+              <div class="cart-total">
+                  <h3>Total: <span id="cart-total-amount">0 Ft</span></h3>
+              </div>
+              <button id="checkout-btn">Proceed to Checkout</button>
+          </div>
+      </div>
+  `;
+  
+  homeSection.innerHTML = cartHTML;
+  renderCart();
+});
+
+  // Clear the explore section if it exists
+  clearExploreSection();
+  
+  function renderCart() {
+    const cartItems = document.getElementById('cart-items');
+    if (!cartItems) return;
+
+    // Clear existing content
+    cartItems.innerHTML = '';
+
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="cart-empty">Your cart is empty</p>';
+        document.getElementById('cart-total-amount').textContent = '0 Ft';
+        return;
+    }
+
+    // Render each cart item
+    cart.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        itemElement.innerHTML = `
+            <div class="cart-item-image">
+                <img src="${item.image}" alt="${item.name}">
+            </div>
+            <div class="cart-item-details">
+                <h3>${item.name}</h3>
+                <p>Price: ${item.price} Ft</p>
+                <div class="quantity-controls">
+                    <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                </div>
+                <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+            </div>
+        `;
+        cartItems.appendChild(itemElement);
+    });
+
+    // Update total
+    const total = calculateTotal();
+    document.getElementById('cart-total-amount').textContent = `${total} Ft`;
+
+    // Add checkout button functionality
+    const checkoutBtn = document.getElementById('checkout-btn');
+    if (checkoutBtn) {
+        checkoutBtn.onclick = function() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+            } else {
+                alert('Proceeding to checkout...');
+                // Add your checkout logic here
+            }
+        };
+    }
 }
 
-// Function to clear the content of the Explore section
+// Cart functions
 function clearExploreSection() {
-  let exploreProductsSection = document.querySelector('.products');
-  if (exploreProductsSection) {
-    exploreProductsSection.innerHTML = '';
+  // Get the explore section if it exists
+  const exploreSection = document.querySelector('.products');
+  if (exploreSection) {
+    exploreSection.innerHTML = ''; // Clear the content
   }
 }
+
+function removeFromCart(itemId) {
+  cart = cart.filter(item => item.id !== itemId);
+  saveCart();
+  renderCart();
+}
+
+function updateQuantity(itemId, change) {
+  const item = cart.find(item => item.id === itemId);
+  if (item) {
+    item.quantity += change;
+    if (item.quantity <= 0) {
+      removeFromCart(itemId);
+    } else {
+      saveCart();
+      renderCart();
+    }
+  }
+}
+
+function removeFromCart(itemId) {
+  cart = cart.filter(item => item.id !== itemId);
+  saveCart();
+  renderCart();
+}
+
+function calculateTotal() {
+  return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+}
+
+function renderCart() {
+  if (!isCartTabActive) return;
+  
+  const cartItems = document.getElementById('cart-items');
+  const cartTotal = document.getElementById('cart-total-amount');
+  
+  if (!cartItems || !cartTotal) return;
+  
+  cartItems.innerHTML = '';
+  
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p>Your cart is empty</p>';
+  } else {
+    cart.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.className = 'cart-item';
+      itemElement.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="cart-item-details">
+          <h3>${item.name}</h3>
+          <p>Price: ${item.price} Ft</p>
+        </div>
+        <div class="cart-item-actions">
+          <div class="quantity-controls">
+            <button onclick="updateQuantity(${item.id}, -1)">-</button>
+            <span>${item.quantity}</span>
+            <button onclick="updateQuantity(${item.id}, 1)">+</button>
+          </div>
+          <button onclick="removeFromCart(${item.id})">Remove</button>
+        </div>
+      `;
+      cartItems.appendChild(itemElement);
+    });
+  }
+  
+  cartTotal.textContent = `${calculateTotal()} Ft`;
+}
+
+// localStorage functions
+function saveCart() {
+  try {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  } catch (error) {
+    console.error('Error saving cart:', error);
+  }
+}
+
+function loadCart() {
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+      cart = JSON.parse(savedCart);
+  }
+}
+
+// Add this at the end of your file
+document.addEventListener('DOMContentLoaded', function() {
+  loadCart();
+  // If cart is open, render it
+  if (isCartTabActive) {
+    renderCart();
+  }
+});
