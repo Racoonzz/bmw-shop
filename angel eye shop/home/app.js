@@ -72,13 +72,27 @@ function navigateTo(option, className, text) {
   // If navigating to cart, show cart content
   if (option === 'cart') {
     isCartTabActive = true;
-    let cartContainer = document.createElement('div');
-    cartContainer.id = 'cart-container';
-    homeSection.appendChild(cartContainer);
+
+    // Create cart structure
+    const cartHTML = `
+      <div id="cart-container">
+          <div class="cart-content">
+              <h2>Shopping Cart</h2>
+              <div id="cart-items"></div>
+              <div class="cart-total">
+                  <h3>Total: <span id="cart-total-amount">0 Ft</span></h3>
+              </div>
+              <button id="checkout-btn">Proceed to Checkout</button>
+          </div>
+      </div>
+    `;
+
+    homeSection.innerHTML = cartHTML;
+
+    // Call renderCart immediately after setting the innerHTML
     renderCart();
   }
 }
-
 
 Home.addEventListener('click', function () {
   navigateTo('home', 'home', 'Home');
@@ -86,9 +100,11 @@ Home.addEventListener('click', function () {
   homeSection.innerHTML = ''; // Clear any existing content
 });
 
+
+// Cart Event Listener
 Cart.addEventListener('click', function () {
   navigateTo('cart', 'cart', 'Cart');
-})
+});
 
 Contacts.addEventListener('click', function () {
   navigateTo('contacts', 'contacts', 'Contacts');
@@ -118,64 +134,77 @@ E46.addEventListener('click', function () {
   navigateTo('e46', 'e46', 'Models > E46');
 })
 
+
+
 // Explore (Products) Option
 //---------------------------
+const exploreContainer = document.getElementById('Explore');
+const exploreLink = document.getElementById('exploreLink');
 
-Explore.addEventListener('click', function () {
+
+const handleExploreClick = (event) => {
+  event.preventDefault(); // Prevent default anchor behavior
   isExploreTabActive = true;
-  home.classList = 'products';
+  home.className = 'products';
   document.getElementById("text").innerHTML = "Products";
 
-  // Select the products section in the Explore tab
-  let exploreProductsSection = document.querySelector('.products');
+    // Select the products section in the Explore tab
+    const exploreProductsSection = document.querySelector('.products');
 
-  // Fetch and display products only when in the Explore tab
-  fetch('https://hur.webmania.cc/products.json')
-    .then(response => response.json())
-    .then(data => {
-      // Check if the Explore tab is still active before updating content
-      if (isExploreTabActive) {
-        let products = data.products;
-        let content = '';
 
-        products.forEach(product => {
-          content += `<div class="listing">
-            <h2>${product.name}</h2>
-            <p>${product.description}</p>
-            <img src="${product.picture}">
-            <h3>${product.price} Ft</h3>`;
+    fetch('https://hur.webmania.cc/products.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (isExploreTabActive) {
+                const products = data.products;
+                const content = products.map(product => `
+                    <div class="listing">
+                        <h2>${product.name}</h2>
+                        <p>${product.description}</p>
+                        <img src="${product.picture}" alt="${product.name}">
+                        <h3>${product.price} Ft</h3>
+                        ${product.stock ? 
+                            `<a id="${product.id}" class="addToCart">Kosárba</a>` : 
+                            '<span>Nem rendelhető</span>'}
+                    </div>
+                `).join('');
 
-          if (product.stock) {
-            content += `<a id="${product.id}" class="addToCart">Kosárba</a>`;
-          } else {
-            content += 'Nem rendelhető';
-          }
+                // Update the products section in the Explore tab
+                exploreProductsSection.innerHTML = content;
 
-          content += '</div>';
+                // Add event listeners to the buttons in the Explore tab
+                addCartEventListeners(exploreProductsSection);
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+            exploreProductsSection.innerHTML = '<p>Products could not be loaded. Please try again later.</p>';
         });
+};
 
-        // Update the products section in the Explore tab only if it is still active
-        exploreProductsSection.innerHTML = content;
 
-        // Add event listeners only to the buttons in the Explore tab
-        const addToCartButtons = exploreProductsSection.querySelectorAll('.addToCart');
-        const buttonCount = addToCartButtons.length;
+// Add event listeners for both the <div> and <a> tag
+exploreContainer.addEventListener('click', handleExploreClick);
+exploreLink.addEventListener('click', handleExplor);
+function addCartEventListeners(section) {
+    const addToCartButtons = section.querySelectorAll('.addToCart');
 
-        for (let i = 0; i < buttonCount; i++) {
-          addToCartButtons[i].addEventListener('click', addToCart);
-        }
-      }
-    })
-    .catch(error => console.error(error));
-});
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', addToCart);
+    });
+}
 
 // Common Logic
 //----------------
-
 function addToCart(event) {
   event.preventDefault();
   const productId = parseInt(event.target.id);
-  
+
   fetch('https://hur.webmania.cc/products.json')
       .then(response => response.json())
       .then(data => {
@@ -222,6 +251,12 @@ function removeFromCart(itemId) {
   renderCart();
 }
 
+function removeFromCart(itemId) {
+  cart = cart.filter(item => item.id !== itemId);
+  saveCart();
+  renderCart();
+}
+
 function calculateTotal() {
   return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 }
@@ -234,16 +269,16 @@ document.addEventListener('click', function (event) {
   }
 });
 
-// Modify your existing Cart event listener to this:
+
 Cart.addEventListener('click', function () {
   isExploreTabActive = false;
   isCartTabActive = true;
-  
+
   const homeSection = document.getElementById('home');
   homeSection.innerHTML = ''; // Clear existing content
   homeSection.className = 'cart';
   document.getElementById("text").innerHTML = "Cart";
-  
+
   // Create cart structure
   const cartHTML = `
       <div id="cart-container">
@@ -257,8 +292,10 @@ Cart.addEventListener('click', function () {
           </div>
       </div>
   `;
-  
+
   homeSection.innerHTML = cartHTML;
+
+  // Call renderCart immediately after setting the innerHTML
   renderCart();
 });
 
@@ -267,14 +304,16 @@ Cart.addEventListener('click', function () {
   
   function renderCart() {
     const cartItems = document.getElementById('cart-items');
-    if (!cartItems) return;
+    const cartTotal = document.getElementById('cart-total-amount');
+
+    if (!cartItems || !cartTotal) return;
 
     // Clear existing content
     cartItems.innerHTML = '';
 
     if (cart.length === 0) {
         cartItems.innerHTML = '<p class="cart-empty">Your cart is empty</p>';
-        document.getElementById('cart-total-amount').textContent = '0 Ft';
+        cartTotal.textContent = '0 Ft';
         return;
     }
 
@@ -302,7 +341,7 @@ Cart.addEventListener('click', function () {
 
     // Update total
     const total = calculateTotal();
-    document.getElementById('cart-total-amount').textContent = `${total} Ft`;
+    cartTotal.textContent = `${total} Ft`;
 
     // Add checkout button functionality
     const checkoutBtn = document.getElementById('checkout-btn');
@@ -317,6 +356,7 @@ Cart.addEventListener('click', function () {
         };
     }
 }
+
 
 // Cart functions
 function clearExploreSection() {
@@ -410,7 +450,8 @@ function loadCart() {
   }
 }
 
-// Add this at the end of your file
+
+
 document.addEventListener('DOMContentLoaded', function() {
   loadCart();
   // If cart is open, render it

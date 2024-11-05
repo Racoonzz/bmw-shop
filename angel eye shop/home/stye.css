@@ -292,52 +292,79 @@ margin-top: 10px;
 
 
 
-
 .products {
   text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light background for better contrast */
+  border-radius: 8px; /* Rounded corners for a softer look */
 }
 
 .products h2 {
-  background:  black;
-  color: whitesmoke;
-  padding: .3rem 1rem;
-  
+  background: #333; /* Darker shade for better readability */
+  color: #f0f0f0; /* Slightly lighter text for contrast */
+  padding: 0.5rem 1rem;
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 20px; /* Spacing below the heading */
 }
 
 .products p {
   font-variant: small-caps;
-  font-size: 1.5rem;
+  font-size: 1rem; /* Smaller font size for better fit */
+  color: #555; /* Softer color for text */
+  margin: 10px 0; /* Spacing above and below paragraphs */
 }
 
 .products img {
-  width: 60%;
+  width: 70%; /* Reduced size for images */
+  max-width: 250px; /* Limit max size for larger screens */
+  border-radius: 5px; /* Rounded corners for images */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: transform 0.3s; /* Smooth transition for zoom effect */
+}
+
+.products img:hover {
+  transform: scale(1.1); /* Zoom effect on hover */
 }
 
 .products a {
-  background:  rgb(204, 204, 204);
-  padding: .3rem 1rem;
+  background: #ccc; /* Neutral background for buttons */
+  padding: 0.5rem 1rem; /* Adjusted padding for buttons */
   margin-top: 20px;
-  color: black;
+  color: #333; /* Dark text for contrast */
   text-decoration: none;
   font-weight: bold;
-  margin-bottom: 1rem;
-  cursor: pointer;
+  border-radius: 5px; /* Rounded corners for buttons */
+  transition: background 0.3s; /* Smooth transition effect */
+}
+
+.products a:hover {
+  background: #bbb; /* Darker shade on hover */
 }
 
 @media (min-width: 640px) {
   .products {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center; /* Center items in the flex container */
   }
   .products div {
-    margin: 0 .5rem;
-    width: 30%;
+    margin: 1rem; /* Spacing between items */
+    width: calc(25% - 2rem); /* Smaller responsive width with spacing */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    border-radius: 8px; /* Rounded corners for product cards */
+    background: #fff; /* White background for product cards */
+    padding: 15px; /* Padding inside product cards */
+    transition: transform 0.3s; /* Smooth transition for zoom effect */
+  }
+
+  .products div:hover {
+    transform: scale(1.05); /* Zoom effect on hover */
   }
 }
 
-.listing{
-padding-bottom: 20px;
-background-color: whitesmoke;
+.listing {
+  padding-bottom: 20px;
+  background-color: #f9f9f9; /* Consistent background */
 }
 
 /* Add these at the end of your CSS file */
