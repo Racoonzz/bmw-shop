@@ -204,6 +204,7 @@ function addCartEventListeners(section) {
 function addToCart(event) {
   event.preventDefault();
   const productId = parseInt(event.target.id);
+  const button = event.target; // Get the button that was clicked
 
   fetch('https://hur.webmania.cc/products.json')
       .then(response => response.json())
@@ -223,7 +224,13 @@ function addToCart(event) {
                   });
               }
               saveCart();
-              alert('Product added to cart!');
+              
+              // Add flashing effect
+              button.classList.add('flashing');
+              setTimeout(() => {
+                  button.classList.remove('flashing'); // Remove effect after 0.5s
+              }, 500);
+
               if (isCartTabActive) {
                   renderCart();
               }

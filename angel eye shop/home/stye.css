@@ -290,12 +290,15 @@ margin-top: 10px;
 }
 
 
+:root {
+  --original-bg-color: #ccc; /* Replace with your button's original background color */
+}
 
 
 .products {
   text-align: center;
   padding: 20px;
-  background-color: #f9f9f9; /* Light background for better contrast */
+  background: rgb(228, 233, 247); /* Light background for better contrast */
   border-radius: 8px; /* Rounded corners for a softer look */
 }
 
@@ -334,32 +337,54 @@ margin-top: 10px;
   text-decoration: none;
   font-weight: bold;
   border-radius: 5px; /* Rounded corners for buttons */
-  transition: background 0.3s; /* Smooth transition effect */
+  transition: 0.3s; /* Smooth transition effect */
 }
 
 .products a:hover {
   background: #bbb; /* Darker shade on hover */
 }
 
-@media (min-width: 640px) {
+@media (min-width: 320px) {
+  .products div {
+    width: calc(100% - 2rem); /* Full width for small screens */
+    margin: 1rem; /* Spacing between items */
+    background-color: #fff; /* Background color for product cards */
+    border-radius: 8px; /* Rounded corners for product cards */
+    padding: 15px; /* Padding inside product cards */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+  }
+}
+
+@media (min-width: 740px) {
   .products {
     display: flex;
     flex-wrap: wrap;
     justify-content: center; /* Center items in the flex container */
   }
   .products div {
+    width: calc(50% - 2rem); /* Two items per row */
     margin: 1rem; /* Spacing between items */
-    width: calc(25% - 2rem); /* Smaller responsive width with spacing */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+    background-color: #fff; /* Background color for product cards */
     border-radius: 8px; /* Rounded corners for product cards */
-    background: #fff; /* White background for product cards */
     padding: 15px; /* Padding inside product cards */
-    transition: transform 0.3s; /* Smooth transition for zoom effect */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for depth */
   }
+}
 
-  .products div:hover {
-    transform: scale(1.05); /* Zoom effect on hover */
+@media (min-width: 960px) {
+  .products div {
+    width: calc(33.333% - 2rem); /* Three items per row */
   }
+}
+
+@media (min-width: 1200px) {
+  .products div {
+    width: calc(25% - 2rem); /* Four items per row */
+  }
+}
+
+.products div:hover {
+  transform: scale(1.05); /* Zoom effect on hover */
 }
 
 .listing {
@@ -535,4 +560,23 @@ margin-top: 10px;
   padding: 20px;
   font-size: 1.2em;
   color: #666;
+}
+
+.flashing {
+  animation: flash 0.5s ease-in-out;
+}
+
+@keyframes flash {
+  0% {
+      background-color: var(--original-bg-color); /* Use a CSS variable for the original background */
+      transform: scale(1);
+  }
+  50% {
+      background-color: #bbc; /* Light gray for the flash */
+      transform: scale(1.05); /* Slightly enlarge */
+  }
+  100% {
+      background-color: var(--original-bg-color); /* Return to the original background */
+      transform: scale(1);
+  }
 }
