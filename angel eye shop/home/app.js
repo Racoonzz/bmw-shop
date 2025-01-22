@@ -112,7 +112,44 @@ Contacts.addEventListener('click', function () {
 
 Models.addEventListener('click', function () {
   navigateTo('models', 'models', 'Models');
-})
+  const homeSection = document.getElementById('home');
+  homeSection.innerHTML = ''; // Clear existing content
+  homeSection.className = 'models';
+
+  // Create model options structure
+  const modelOptionsHTML = `
+    <div class="model-options">
+      
+      <div class="model-option">
+        <h3>E30</h3>
+        <p>The E30 is a compact executive car produced by BMW from 1982 to 1994.</p>
+        <button onclick="navigateTo('e30', 'e30', 'Models > E30')">View Details</button>
+      </div>
+      <div class="model-option">
+        <h3>E34</h3>
+        <p>The E34 is a compact executive car produced by BMW from 1988 to 1996.</p>
+        <button onclick="navigateTo('e34', 'e34', 'Models > E34')">View Details</button>
+      </div>
+      <div class="model-option">
+        <h3>E36</h3>
+        <p>The E36 is a compact executive car produced by BMW from 1990 to 2000.</p>
+        <button onclick="navigateTo('e36', 'e36', 'Models > E36')">View Details</button>
+      </div>
+      <div class="model-option">
+        <h3>E39</h3>
+        <p>The E39 is a compact executive car produced by BMW from 1995 to 2004.</p>
+        <button onclick="navigateTo('e39', 'e39', 'Models > E39')">View Details</button>
+      </div>
+      <div class="model-option">
+        <h3>E46</h3>
+        <p>The E46 is a compact executive car produced by BMW from 1998 to 2006.</p>
+        <button onclick="navigateTo('e46', 'e46', 'Models > E46')">View Details</button>
+      </div>
+    </div>
+  `;
+
+  homeSection.innerHTML = modelOptionsHTML;
+});
 
 E30.addEventListener('click', function () {
   navigateTo('e30', 'e30', 'Models > E30');

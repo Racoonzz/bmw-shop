@@ -583,3 +583,59 @@ margin-top: 10px;
 
 
 
+.model-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.model-option {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: calc(33.33% - 40px);
+}
+
+.model-option h3 {
+  margin-top: 0;
+}
+
+.model-option p {
+  margin-bottom: 20px;
+}
+
+.model-option button {
+  background-color: #4CAF50;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.model-option button:hover {
+  background-color: #3e8e41;
+}
+
+/* Media queries for different screen sizes */
+
+@media (max-width: 1200px) {
+  .model-option {
+    width: calc(50% - 40px);
+  }
+}
+
+@media (max-width: 768px) {
+  .model-option {
+    width: calc(100% - 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .model-option {
+    margin: 10px;
+    padding: 10px;
+  }
+}
